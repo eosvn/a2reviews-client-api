@@ -50,9 +50,13 @@ Create an instance of the A2Reviews Client, then used to access the A2Reviews Cl
 
 ```php
 <?php
-use EOSVN\A2ReviewsClient\A2ReviewsClient;
 
-$a2Review = new A2ReviewsClient();
+require_once __DIR__ . "/vendor/autoload.php";
+
+$a2Review = new EOSVN\A2ReviewsClient\A2ReviewsClient([
+    'api_key' => '{A2Review_API_Key}',
+    'api_secret' => '{A2Review_API_Secret}',
+]);
 ```
 
 ## Examples
@@ -66,8 +70,6 @@ APIs for reviews of product, allows to get the reviews of a product or all produ
 ##### Get product reviews
 
 ```php
-$a2Review = new A2ReviewsClient();
-
 $response = $a2Review->review->getProductReviews([
     'handle' => '{product_handle}',
     'limit' => 2 // Number record per page
@@ -77,8 +79,6 @@ $response = $a2Review->review->getProductReviews([
 ##### Get feature reviews
 
 ```php
-$a2Review = new A2ReviewsClient();
-
 $response = $a2Review->review->getFeatureReviews([
     'limit' => 2
 ]);
@@ -87,8 +87,6 @@ $response = $a2Review->review->getFeatureReviews([
 ##### Get block list reviews
 
 ```php
-$a2Review = new A2ReviewsClient();
-
 $response = $a2Review->review->getBlockListReviews([
     'limit' => 2
 ]);
@@ -97,8 +95,6 @@ $response = $a2Review->review->getBlockListReviews([
 ##### Get block reviews
 
 ```php
-$a2Review = new A2ReviewsClient();
-
 $response = $a2Review->review->getBlockReviews([
     'limit' => 2
 ]);
@@ -107,8 +103,6 @@ $response = $a2Review->review->getBlockReviews([
 ##### Write review to product
 
 ```php
-$a2Review = new A2ReviewsClient();
-
 $response = $a2Review->review->postReviewToProduct([
     'handle' => '{product_handle}',
     'review' => [
@@ -124,8 +118,6 @@ $response = $a2Review->review->postReviewToProduct([
 ##### Update a review
 
 ```php
-$a2Review = new A2ReviewsClient();
-
 $response = $a2Review->review->updateReview([
     'id' => '{review_id}',
     'handle' => '{product_handle}',
@@ -142,8 +134,6 @@ $response = $a2Review->review->updateReview([
 ##### Update image review
 
 ```php
-$a2Review = new A2ReviewsClient();
-
 $response = $a2Review->review->updateImageReview([
     'id' => '{review_id}',
     'handle' => '{product_handle}',
@@ -161,33 +151,31 @@ APIs for client site, allows to get the settings global, setting languages.
 ##### Get global settings
 
 ```php
-$a2Review = new A2ReviewsClient();
-
 $response = $a2Review->setting->getGlobalSettings();
 ```
 
 ##### Get reviews languages
 
 ```php
-$a2Review = new A2ReviewsClient();
-
 $response = $a2Review->setting->getReviewLanguages();
 ```
 
 ##### Get questions answers language
 
 ```php
-$a2Review = new A2ReviewsClient();
-
 $response = $a2Review->setting->getQuestionAnswerLanguages();
 ```
 
 ##### Get common languages
  
 ```php
-$a2Review = new A2ReviewsClient();
-
 $response = $a2Review->setting->getCommonLanguages();
+```
+
+After request, using below way to get data
+
+```php
+$response->getData();
 ```
 
 ## Documentation
