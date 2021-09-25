@@ -62,7 +62,7 @@ class Review extends NodeAbstract
      */
     public function getBlockReviews($parameters = []): ResponseData
     {
-        $parameters['block_id'] = $parameters['block_id_id'] ?? 0;
+        $parameters['block_id'] = $parameters['block_id'] ?? 0;
         return $this->method('/v1/blocks/' . $parameters['block_id'] . '/reviews', 'GET', $parameters);
     }
 

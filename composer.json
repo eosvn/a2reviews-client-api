@@ -1,6 +1,6 @@
 {
     "name": "eosvn/a2reviews-client-api",
-    "description": "The laravel package integrate with a2reviews api system. Development by A2Reviews, Inc.",
+    "description": "The PHP SDK integrate with A2Reviews Client API system. Development by A2Reviews, Inc.",
     "type": "library",
     "keywords": [
         "a2reviews",
@@ -12,7 +12,7 @@
         "a2reviews-php-sdk"
     ],
     "license": "MIT",
-    "homepage": "https://github.com/eosvn/a2reviews-client",
+    "homepage": "https://github.com/eosvn/a2reviews-client-api",
     "authors": [
         {
             "name": "Be Duc Tai",
@@ -24,7 +24,7 @@
             "name": "Phi Hoang",
             "email": "hoangphi.dev@gmail.com",
             "homepage": "https://github.com/hoangphidev",
-            "role": "Developer"
+            "role": "Maintainer"
         }
     ],
     "minimum-stability": "dev",
@@ -39,20 +39,10 @@
     "autoload": {
         "psr-4": {
             "EOSVN\\A2ReviewsClient\\": "src/"
-        },
-        "files": [
-            "src/Helpers/common.php"
-        ]
+        }
     },
     "config": {
         "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "EOSVN\\A2ReviewsClient\\A2ReviewsClientServiceProvider"
-            ]
-        }
     },
     "prefer-stable": true
 }

@@ -3,24 +3,20 @@
 namespace EOSVN\A2ReviewsClient;
 
 use EOSVN\A2ReviewsClient\Abstracts\NodeAbstract;
-use EOSVN\A2ReviewsClient\Exceptions\AuthException;
-use EOSVN\A2ReviewsClient\Exceptions\BadRequestException;
-use EOSVN\A2ReviewsClient\Exceptions\ClientException;
-use EOSVN\A2ReviewsClient\Exceptions\Factory;
-use EOSVN\A2ReviewsClient\Exceptions\ServerException;
 use EOSVN\A2ReviewsClient\Interfaces\SignatureGeneratorInterface;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException as GuzzleClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\ServerException as GuzzleServerException;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Psr7\Utils;
-use GuzzleHttp\Psr7\Request;
 use Illuminate\Contracts\Foundation\Application;
+use InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use InvalidArgumentException;
+use Psr\Http\Message\UriInterface;
 
 /**
  * Class A2ReviewsClient
@@ -35,6 +31,14 @@ use InvalidArgumentException;
  */
 class A2ReviewsClient
 {
+    public const A2REV_BASE_URL = 'https://api.a2rev.com';
+
+    public const A2REV_USER_AGENT = 'A2reviews';
+
+    public const A2REV_SITE_API_KEY = 'A2REV_SITE_API_KEY';
+
+    public const A2REV_SITE_API_SECRET = 'A2REV_SITE_API_SECRET';
+
     /**
      * @var HttpClient
      */
@@ -67,31 +71,42 @@ class A2ReviewsClient
      */
     protected $a2ReviewApiSecret;
 
-    /** @var SignatureGeneratorInterface */
+    /**
+     * @var SignatureGeneratorInterface
+     */
     protected $signatureGenerator;
 
-    /** @var NodeAbstract[] */
+    /**
+     * @var array NodeAbstract[]
+     */
     protected $nodes = [];
 
     /**
      * A2ReviewsClient constructor.
+     * @param array $config
      */
-    public function __construct()
+    public function __construct(array $config = [])
     {
-        $this->httpClient = new HttpClient([
+        $config = array_merge([
+            'http_client' => null,
+            'user_agent' => self::A2REV_USER_AGENT,
+            'base_url' => self::A2REV_BASE_URL,
+            'api_key' => getenv(self::A2REV_SITE_API_KEY),
+            'api_secret' => getenv(self::A2REV_SITE_API_SECRET),
+            SignatureGeneratorInterface::class => null,
+        ], $config);
+
+        $this->httpClient = $config['http_client'] ?: new HttpClient([
             'verify' => false
         ]);
 
-        $this->setUserAgent(a2_config('user_agent'));
-
-        $this->setBaseUrl(a2_config('base_url'));
-
-        $this->a2ReviewApiKey = a2_config('api_key');
-
-        $this->a2ReviewApiSecret = a2_config('api_secret');
+        $this->setUserAgent($config['user_agent']);
+        $this->setBaseUrl($config['base_url']);
+        $this->a2ReviewApiKey = $config['api_key'];
+        $this->a2ReviewApiSecret = $config['api_secret'];
 
         // Check valid authenticate
-        $signatureGenerator = null;
+        $signatureGenerator = $config[SignatureGeneratorInterface::class];
         if (is_null($signatureGenerator)) {
             $this->signatureGenerator = new SignatureGenerator($this->a2ReviewApiSecret);
         } elseif ($signatureGenerator instanceof SignatureGeneratorInterface) {
@@ -164,7 +179,7 @@ class A2ReviewsClient
      *
      * @return mixed
      */
-    public function getBaseUrl()
+    public function getBaseUrl(): UriInterface
     {
         return $this->baseUrl;
     }
@@ -252,21 +267,10 @@ class A2ReviewsClient
         try {
             $response = $this->httpClient->send($request);
         } catch (GuzzleClientException $exception) {
-            switch ($exception->getCode()) {
-                case 400:
-                    $className = BadRequestException::class;
-                    break;
-                case 403:
-                    $className = AuthException::class;
-                    break;
-                default:
-                    $className = ClientException::class;
-            }
-            throw Factory::create($className, $exception);
+            $response = $exception->getResponse();
         } catch (GuzzleServerException $exception) {
-            throw Factory::create(ServerException::class, $exception);
+            $response = $exception->getResponse();
         }
-
         return $response;
     }
 }
