@@ -103,7 +103,7 @@ $response = $a2Review->review->getBlockReviews([
 ##### Write review to product
 
 ```php
-$response = $a2Review->review->postReviewToProduct([
+$response = $a2Review->review->addReviewToProduct([
     'handle' => '{product_handle}',
     'review' => [
         'rating' => 4,
